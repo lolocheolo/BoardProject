@@ -26,7 +26,7 @@ public class BoardServlet extends HttpServlet {
 		request.setCharacterEncoding("UTF-8");
 		String actionName = request.getParameter("a");
 		System.out.println("board:" + actionName);
-
+		// 화이팅
 		if ("list".equals(actionName)) {
 			// 리스트 가져오기
 			BoardDao dao = new BoardDaoImpl();
