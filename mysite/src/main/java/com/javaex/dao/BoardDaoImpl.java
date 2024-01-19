@@ -100,6 +100,7 @@ public class BoardDaoImpl implements BoardDao {
 
             if (rs.next()) {
                 totalPosts = rs.getInt(1);
+                System.out.println("**************************"+totalPosts); //확인용
             }
         } catch (SQLException e) {
             System.out.println("error:" + e);
@@ -118,8 +119,9 @@ public class BoardDaoImpl implements BoardDao {
                 System.out.println("error:" + e);
             }
         }
-
+      
         return totalPosts;
+        
     }
 	
 	

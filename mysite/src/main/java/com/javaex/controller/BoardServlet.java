@@ -32,6 +32,7 @@ public class BoardServlet extends HttpServlet {
 			int pageNo=1; //기본 페이지 번호
 			int pageSize=10; //페이지크기
 			
+			
 			//페이지 번호와 페이지 크기 파라미터가 있는경우 값을 설정
 			String pageNoStr=request.getParameter("pageNo");
 			String pageSizeStr=request.getParameter("pageSize");
@@ -64,7 +65,6 @@ public class BoardServlet extends HttpServlet {
 			
 			//RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/board/list.jsp");
 	  //  rd.forward(request, response);
-			 WebUtil.forward(request, response, "/WEB-INF/views/board/list.jsp");
 		} 
 		
 		else if ("read".equals(actionName)) {
@@ -163,4 +163,6 @@ public class BoardServlet extends HttpServlet {
 		return authUser;
 	}
 
+	
+	
 }

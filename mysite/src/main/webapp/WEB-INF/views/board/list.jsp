@@ -1,6 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-
+<%@ page import="com.javaex.dao.BoardDao"%>
+<%@ page import="com.javaex.dao.BoardDaoImpl"%>
+<%
+  // BoardDao 객체 생성
+  BoardDao boardDao = new BoardDaoImpl();
+  // DAO를 통해 전체 게시물 수 가져오기
+  int totalPosts = boardDao.getTotalPosts();
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -21,8 +28,8 @@
 			<div id="board">
 			
 				<!-- 전체 게시물 수 표시 -->
-        <p style="float: left; margin-top: 40px;">전체 게시물 수:  ${totalPosts}</p>
-
+        <p style="float: left; margin-top: 40px;">전체 게시물 수:  <%= totalPosts %>  </p>
+       
                  <!-- 검색 폼 -->
 				    <form id="search_form" action="" method="post">
 					<input type="text" id="kwd" name="kwd" value="">
@@ -36,8 +43,11 @@
 						<th>조회수</th>
 						<th>작성일</th>
 						<th>&nbsp;</th>
-					</tr>				
+					</tr>	
+					
+								
 					<c:forEach items="${list }" var="vo">
+						
 						<tr>
 							<td>${vo.no }</td>
 							<td><a href="/mysite/board?a=read&no=${vo.no }"> ${vo.title } </a></td>
