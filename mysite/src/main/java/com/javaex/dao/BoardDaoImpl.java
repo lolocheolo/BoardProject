@@ -23,7 +23,7 @@ public class BoardDaoImpl implements BoardDao {
     return conn;
   }
   
-	public List<BoardVo> getList() {
+  public List<BoardVo> getList() {
 
 		// 0. import java.sql.*;
 		Connection conn = null;
@@ -42,6 +42,68 @@ public class BoardDaoImpl implements BoardDao {
 			
 			pstmt = conn.prepareStatement(query);
 
+			rs = pstmt.executeQuery();
+			// 4.결과처리
+			while (rs.next()) {
+				int no = rs.getInt("no");
+				String title = rs.getString("title");
+				int hit = rs.getInt("hit");
+				String regDate = rs.getString("reg_date");
+				int userNo = rs.getInt("user_no");
+				String userName = rs.getString("name");
+				
+				BoardVo vo = new BoardVo(no, title, hit, regDate, userNo, userName);
+				list.add(vo);
+			}
+			
+		} catch (SQLException e) {
+			System.out.println("error:" + e);
+		} finally {
+			// 5. 자원정리
+			try {
+				if (pstmt != null) {
+					pstmt.close();
+				}
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				System.out.println("error:" + e);
+			}
+
+		}
+		
+		return list;
+
+	}
+  
+  // 게시물 검색 기능구현 : 작성자, 게시물 작성일시, 제목, 내용 으로 검색가능해야 함
+  public List<BoardVo> getSearchList(String word) {
+		// 0. import java.sql.*;
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		List<BoardVo> list = new ArrayList<BoardVo>();
+
+		try {
+			conn = getConnection();
+			
+			// 3. SQL문 준비 / 바인딩 / 실행    
+			String query = "select b.no, b.title, b.hit, b.reg_date, b.user_no, u.name "
+					     + " from board b "
+					     + " JOIN users u ON b.user_no = u.no "
+					     + " where LOWER(u.name) LIKE LOWER(?) "
+					     + " OR TO_CHAR(b.reg_date, 'YYYY-MM-DD') LIKE ? "
+					     + " OR LOWER(b.title) LIKE LOWER(?) "
+					     + " OR LOWER(b.content) LIKE LOWER(?) "
+					     + " order by no desc";
+			
+			pstmt = conn.prepareStatement(query);
+			
+			for (int i = 1; i <= 4; i++) {
+	            pstmt.setString(i, "%" + word + "%".toLowerCase());
+	        }
+			
 			rs = pstmt.executeQuery();
 			// 4.결과처리
 			while (rs.next()) {
@@ -142,11 +204,11 @@ public class BoardDaoImpl implements BoardDao {
 		  conn = getConnection();
 		  
 		  System.out.println("vo.userNo : ["+vo.getUserNo()+"]");
-      System.out.println("vo.title : ["+vo.getTitle()+"]");
-      System.out.println("vo.content : ["+vo.getContent()+"]");
-      
-			// 3. SQL문 준비 / 바인딩 / 실행
-      String query = "insert into board values (seq_board_no.nextval, ?, ?, 0, sysdate, ?, 0, 0, 0)";
+	      System.out.println("vo.title : ["+vo.getTitle()+"]");
+	      System.out.println("vo.content : ["+vo.getContent()+"]");
+	      
+				// 3. SQL문 준비 / 바인딩 / 실행
+	      String query = "insert into board values (seq_board_no.nextval, ?, ?, 0, sysdate, ?, 0, 0, 0)";
 			pstmt = conn.prepareStatement(query);
 
 			pstmt.setString(1, vo.getTitle());

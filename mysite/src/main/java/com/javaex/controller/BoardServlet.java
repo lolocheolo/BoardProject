@@ -26,21 +26,29 @@ public class BoardServlet extends HttpServlet {
 		request.setCharacterEncoding("UTF-8");
 		String actionName = request.getParameter("a");
 		System.out.println("board:" + actionName);
-		// 화이팅
+		
 		if ("list".equals(actionName)) {
-			// 리스트 가져오기
+			// 리스트 가져오기 (기본)
 			BoardDao dao = new BoardDaoImpl();
 			List<BoardVo> list = dao.getList();
 
 			System.out.println(list.toString());
-
 			// 리스트 화면에 보내기
 			request.setAttribute("list", list);
 			//WebUtil.forward(request, response, "/WEB-INF/views/board/list.jsp");
 			
+			// search 
+			if (request.getParameter("kwd") != null) {
+				String word = request.getParameter("kwd");
+				System.out.println("검색어: " + word);
+	
+				// 검색어를 JSP 페이지로 전송 (예시)
+				List<BoardVo> searchedList = dao.getSearchList(word);
+			    request.setAttribute("list", searchedList);
+			}
+			
 			RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/board/list.jsp");
 	    rd.forward(request, response);
-	    
 		} else if ("read".equals(actionName)) {
 			// 게시물 가져오기
 			int no = Integer.parseInt(request.getParameter("no"));
