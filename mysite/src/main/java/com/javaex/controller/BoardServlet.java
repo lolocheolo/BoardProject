@@ -29,19 +29,45 @@ public class BoardServlet extends HttpServlet {
 
 		if ("list".equals(actionName)) {
 			// 리스트 가져오기
+			int pageNo=1; //기본 페이지 번호
+			int pageSize=10; //페이지크기
+			
+			//페이지 번호와 페이지 크기 파라미터가 있는경우 값을 설정
+			String pageNoStr=request.getParameter("pageNo");
+			String pageSizeStr=request.getParameter("pageSize");
+			
+			if(pageNoStr != null && !pageNoStr.equals("")) {
+				pageNo=Integer.parseInt(pageNoStr);
+				
+			}
+			
+			if(pageSizeStr != null && !pageSizeStr.equals("")) {
+				pageSize = Integer.parseInt(pageSizeStr);
+			}
+			
 			BoardDao dao = new BoardDaoImpl();
-			List<BoardVo> list = dao.getList();
+			
+			 // 전체 페이지 수(totalPages)를 계산
+		    int totalPosts = dao.getTotalPosts(); // 예시로 getTotalPosts 메서드를 추가해야 합니다.
+		    int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
+		    
+		    
+			List<BoardVo> list = dao.getPageList(pageNo, pageSize);
 
-			System.out.println(list.toString());
+		//	System.out.println(list.toString());
 
 			// 리스트 화면에 보내기
 			request.setAttribute("list", list);
-			//WebUtil.forward(request, response, "/WEB-INF/views/board/list.jsp");
+		    request.setAttribute("pageNo", pageNo);
+		    request.setAttribute("totalPages", totalPages);
+			WebUtil.forward(request, response, "/WEB-INF/views/board/list.jsp");
 			
-			RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/board/list.jsp");
-	    rd.forward(request, response);
-	    
-		} else if ("read".equals(actionName)) {
+			//RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/board/list.jsp");
+	  //  rd.forward(request, response);
+			 WebUtil.forward(request, response, "/WEB-INF/views/board/list.jsp");
+		} 
+		
+		else if ("read".equals(actionName)) {
 			// 게시물 가져오기
 			int no = Integer.parseInt(request.getParameter("no"));
 			BoardDao dao = new BoardDaoImpl();
@@ -52,7 +78,9 @@ public class BoardServlet extends HttpServlet {
 			// 게시물 화면에 보내기
 			request.setAttribute("boardVo", boardVo);
 			WebUtil.forward(request, response, "/WEB-INF/views/board/read.jsp");
-		} else if ("modifyform".equals(actionName)) {
+		} 
+		
+		else if ("modifyform".equals(actionName)) {
 			// 게시물 가져오기
 			int no = Integer.parseInt(request.getParameter("no"));
 			BoardDao dao = new BoardDaoImpl();
@@ -61,7 +89,9 @@ public class BoardServlet extends HttpServlet {
 			// 게시물 화면에 보내기
 			request.setAttribute("boardVo", boardVo);
 			WebUtil.forward(request, response, "/WEB-INF/views/board/modifyform.jsp");
-		} else if ("modify".equals(actionName)) {
+		} 
+		
+		else if ("modify".equals(actionName)) {
 			// 게시물 가져오기
 			String title = request.getParameter("title");
 			String content = request.getParameter("content");
@@ -73,7 +103,9 @@ public class BoardServlet extends HttpServlet {
 			dao.update(vo);
 			
 			WebUtil.redirect(request, response, "/mysite/board?a=list");
-		} else if ("writeform".equals(actionName)) {
+		} 
+		
+		else if ("writeform".equals(actionName)) {
 			// 로그인 여부체크
 			UserVo authUser = getAuthUser(request);
 			if (authUser != null) { // 로그인했으면 작성페이지로
@@ -82,7 +114,9 @@ public class BoardServlet extends HttpServlet {
 				WebUtil.redirect(request, response, "/mysite/board?a=list");
 			}
 
-		} else if ("write".equals(actionName)) {
+		} 
+		
+		else if ("write".equals(actionName)) {
 			UserVo authUser = getAuthUser(request);
 
 			String title = request.getParameter("title");
@@ -99,7 +133,9 @@ public class BoardServlet extends HttpServlet {
 
 			WebUtil.redirect(request, response, "/mysite/board?a=list");
 
-		} else if ("delete".equals(actionName)) {
+		} 
+		
+		else if ("delete".equals(actionName)) {
 			int no = Integer.parseInt(request.getParameter("no"));
 
 			BoardDao dao = new BoardDaoImpl();
@@ -107,7 +143,9 @@ public class BoardServlet extends HttpServlet {
 
 			WebUtil.redirect(request, response, "/mysite/board?a=list");
 
-		} else {
+		} 
+		
+		else {
 			WebUtil.redirect(request, response, "/mysite/board?a=list");
 		}
 	}

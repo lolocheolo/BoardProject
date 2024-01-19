@@ -23,60 +23,105 @@ public class BoardDaoImpl implements BoardDao {
     return conn;
   }
   
-	public List<BoardVo> getList() {
+  public List<BoardVo> getPageList(int pageNo, int pageSize) {
+	    Connection conn = null;
+	    PreparedStatement pstmt = null;
+	    ResultSet rs = null;
+	    List<BoardVo> pagelist = new ArrayList<>();
 
-		// 0. import java.sql.*;
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		List<BoardVo> list = new ArrayList<BoardVo>();
+	    try {
+	        conn = getConnection();
 
-		try {
-			conn = getConnection();
+	        String query = 
+	        					"SELECT * " +
+	        		            "FROM (SELECT b.no, b.title, b.content, b.hit, b.reg_date, b.user_no, u.name, " +
+	        		            "             ROW_NUMBER() OVER (ORDER BY b.no DESC) AS rnum " +
+	        		            "      FROM board b, users u " +
+	        		            "      WHERE b.user_no = u.no) " +
+	        		            "WHERE rnum BETWEEN ? AND ?";
 
-			// 3. SQL문 준비 / 바인딩 / 실행
-			String query = "select b.no, b.title, b.hit, b.reg_date, b.user_no, u.name "
-					     + " from board b, users u "
-					     + " where b.user_no = u.no "
-					     + " order by no desc";
-			
-			pstmt = conn.prepareStatement(query);
+	        int startRow = (pageNo - 1) * pageSize + 1;
+	        int endRow = pageNo * pageSize;
 
-			rs = pstmt.executeQuery();
-			// 4.결과처리
-			while (rs.next()) {
-				int no = rs.getInt("no");
-				String title = rs.getString("title");
-				int hit = rs.getInt("hit");
-				String regDate = rs.getString("reg_date");
-				int userNo = rs.getInt("user_no");
-				String userName = rs.getString("name");
-				
-				BoardVo vo = new BoardVo(no, title, hit, regDate, userNo, userName);
-				list.add(vo);
-			}
-			
-		} catch (SQLException e) {
-			System.out.println("error:" + e);
-		} finally {
-			// 5. 자원정리
-			try {
-				if (pstmt != null) {
-					pstmt.close();
-				}
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException e) {
-				System.out.println("error:" + e);
-			}
+	        pstmt = conn.prepareStatement(query);
+	        pstmt.setInt(1, startRow);
+	        pstmt.setInt(2, endRow);
 
-		}
-		
-		return list;
+	        rs = pstmt.executeQuery();
 
+	        while (rs.next()) {
+	        	int no = rs.getInt("no");
+	            String title = rs.getString("title");
+	            String content = rs.getString("content");
+	            int hit = rs.getInt("hit");
+	            String regDate = rs.getString("reg_date");
+	            int userNo = rs.getInt("user_no");
+	            String userName = rs.getString("name");
+	            BoardVo vo = new BoardVo(no, title, content, hit, regDate, userNo, userName);
+	            pagelist.add(vo);
+	        }
+
+	    } catch (SQLException e) {
+	        System.out.println("error:" + e);
+	    } finally {
+	        try {
+	            if (rs != null) {
+	                rs.close();
+	            }
+	            if (pstmt != null) {
+	                pstmt.close();
+	            }
+	            if (conn != null) {
+	                conn.close();
+	            }
+	        } catch (SQLException e) {
+	            System.out.println("error:" + e);
+	        }
+	    }
+
+	    return pagelist;
 	}
+	
+	
+	
+	public int getTotalPosts() {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        int totalPosts = 0;
 
+        try {
+            conn = getConnection();
+
+            String query = "SELECT COUNT(*) FROM board";
+
+            pstmt = conn.prepareStatement(query);
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                totalPosts = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.out.println("error:" + e);
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (pstmt != null) {
+                    pstmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                System.out.println("error:" + e);
+            }
+        }
+
+        return totalPosts;
+    }
+	
 	
 	public BoardVo getBoard(int no) {
 
@@ -146,7 +191,7 @@ public class BoardDaoImpl implements BoardDao {
       System.out.println("vo.content : ["+vo.getContent()+"]");
       
 			// 3. SQL문 준비 / 바인딩 / 실행
-      String query = "insert into board values (seq_board_no.nextval, ?, ?, 0, sysdate, ?, 0, 0, 0)";
+      String query = "insert into board values (seq_board_no.nextval, ?, ?, 0, sysdate, ?, seq_board_no.currval, 0, 0)";
 			pstmt = conn.prepareStatement(query);
 
 			pstmt.setString(1, vo.getTitle());
