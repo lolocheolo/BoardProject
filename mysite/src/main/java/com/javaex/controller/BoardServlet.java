@@ -33,7 +33,7 @@ public class BoardServlet extends HttpServlet {
 			int pageSize=10; //페이지크기
 			
 			
-			//페이지 번호와 페이지 크기 파라미터가 있는경우 값을 설정
+			//페이지 번호, 페이지 크기 파라미터 값 설정
 			String pageNoStr=request.getParameter("pageNo");
 			String pageSizeStr=request.getParameter("pageSize");
 			
@@ -49,7 +49,7 @@ public class BoardServlet extends HttpServlet {
 			BoardDao dao = new BoardDaoImpl();
 			
 			 // 전체 페이지 수(totalPages)를 계산
-		    int totalPosts = dao.getTotalPosts(); // 예시로 getTotalPosts 메서드를 추가해야 합니다.
+		    int totalPosts = dao.getTotalPosts(); 
 		    int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
 		    
 		    
@@ -155,7 +155,7 @@ public class BoardServlet extends HttpServlet {
 		doGet(request, response);
 	}
 
-	// 로그인 되어 있는 정보를 가져온다.
+	// 로그인 되어 있는 정보를 가져옴
 	protected UserVo getAuthUser(HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		UserVo authUser = (UserVo) session.getAttribute("authUser");

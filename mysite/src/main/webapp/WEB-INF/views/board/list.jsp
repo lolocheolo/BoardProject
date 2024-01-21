@@ -66,7 +66,7 @@
 				
 				
 				
-				<div class="pager">
+<div class="pager">
     <ul>
         <c:if test="${pageNo > 1}">
             <li><a href="/mysite/board?a=list&pageNo=${pageNo - 1}">◀</a></li>

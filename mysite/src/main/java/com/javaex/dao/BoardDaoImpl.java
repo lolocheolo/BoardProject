@@ -23,6 +23,8 @@ public class BoardDaoImpl implements BoardDao {
     return conn;
   }
   
+  
+  
   public List<BoardVo> getPageList(int pageNo, int pageSize) {
 	    Connection conn = null;
 	    PreparedStatement pstmt = null;
@@ -100,7 +102,6 @@ public class BoardDaoImpl implements BoardDao {
 
             if (rs.next()) {
                 totalPosts = rs.getInt(1);
-                System.out.println("**************************"+totalPosts); //확인용
             }
         } catch (SQLException e) {
             System.out.println("error:" + e);
@@ -155,6 +156,12 @@ public class BoardDaoImpl implements BoardDao {
 				int userNo = rs.getInt("user_no");
 				String userName = rs.getString("name");
 				
+				
+				// 조회수 증가 코드 추가
+		        hit++; // 현재 조회수를 1 증가시킴
+		        updateHit(no, hit); // 조회수를 업데이트하는 메서드 호출
+		        
+		        
 				boardVo = new BoardVo(no, title, content, hit, regDate, userNo, userName);
 			}
 			
@@ -178,6 +185,55 @@ public class BoardDaoImpl implements BoardDao {
 		return boardVo;
 
 	}
+	
+	
+	
+	// 조회수 업데이트 메서드 추가
+	private void updateHit(int no, int hit) {
+	    Connection conn = null;
+	    PreparedStatement pstmt = null;
+
+	    try {
+	        conn = getConnection();
+
+	        // 조회수를 업데이트하는 SQL문 작성
+	        String query = "UPDATE board SET hit = ? WHERE no = ?";
+	        pstmt = conn.prepareStatement(query);
+	        pstmt.setInt(1, hit);
+	        pstmt.setInt(2, no);
+
+	        // SQL문 실행
+	        pstmt.executeUpdate();
+
+	        // 트랜잭션 커밋
+	        conn.commit();
+	    } catch (SQLException e) {
+	        // 오류 처리
+	        try {
+	            if (conn != null) {
+	                conn.rollback(); // 오류 발생 시 롤백
+	            }
+	        } catch (SQLException rollbackEx) {
+	            rollbackEx.printStackTrace();
+	        }
+	        e.printStackTrace();
+	    } finally {
+	        // 자원 정리
+	        try {
+	            if (pstmt != null) {
+	                pstmt.close();
+	            }
+	            if (conn != null) {
+	                conn.close();
+	            }
+	        } catch (SQLException closeEx) {
+	            closeEx.printStackTrace();
+	        }
+	    }
+	}
+	
+	
+	
 	
 	public int insert(BoardVo vo) {
 		// 0. import java.sql.*;
