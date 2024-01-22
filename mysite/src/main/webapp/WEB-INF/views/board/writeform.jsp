@@ -16,7 +16,7 @@
 		
 		<div id="content">
 			<div id="board">
-				<form class="board-form" method="post" action="/mysite/board">
+				<form class="board-form" method="post" action="/mysite/boardwirteupdate" enctype="multipart/form-data">
 					<input type ="hidden" name = "a" value="write">
 					<table class="tbl-ex">
 						<tr>
@@ -30,6 +30,18 @@
 							<td class="label">내용</td>
 							<td>
 								<textarea id="content" name="content"></textarea>
+							</td>
+						</tr>
+						<tr>
+							<td class="label">파일1</td>
+							<td>
+								<input type="file" name="filename1" size="50" maxlength="50">
+							</td>
+						</tr>
+						<tr>
+							<td class="label">파일2</td>
+							<td>
+								<input type="file" name="filename2" size="50" maxlength="50">
 							</td>
 						</tr>
 					</table>

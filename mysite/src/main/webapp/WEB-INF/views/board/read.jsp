@@ -34,6 +34,14 @@
 							</div>
 						</td>
 					</tr>
+					<tr>
+						<td class="label">첨부파일1</td>
+						<td><a href="/mysite/board?a=download&fileName=${boardVo.fileName1}">${boardVo.fileName1}</a></td>
+					</tr>
+					<tr>
+						<td class="label">첨부파일2</td>
+						<td><a href="/mysite/board?a=download&fileName=${boardVo.fileName2}">${boardVo.fileName2}</a></td>
+					</tr>
 				</table>
 				<div class="bottom">
 					<a href="/mysite/board">글목록</a>

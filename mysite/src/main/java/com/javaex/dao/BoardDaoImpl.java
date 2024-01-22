@@ -90,7 +90,7 @@ public class BoardDaoImpl implements BoardDao {
 		  conn = getConnection();
 
 			// 3. SQL문 준비 / 바인딩 / 실행
-			String query = "select b.no, b.title, b.content, b.hit, b.reg_date, b.user_no, u.name "
+			String query = "select b.no, b.title, b.content, b.hit, b.reg_date, b.user_no, u.name, b.FILENAME1, b.FILESIZE1, b.FILENAME2, b.FILESIZE2 "
 					     + "from board b, users u "
 					     + "where b.user_no = u.no "
 					     + "and b.no = ?";
@@ -107,8 +107,12 @@ public class BoardDaoImpl implements BoardDao {
 				String regDate = rs.getString("reg_date");
 				int userNo = rs.getInt("user_no");
 				String userName = rs.getString("name");
+				String fileName1 = rs.getString("fileName1");
+				int fileSize1 = rs.getInt("fileSize1");
+				String fileName2 = rs.getString("fileName2");
+				int fileSize2 = rs.getInt("fileSize2");
 				
-				boardVo = new BoardVo(no, title, content, hit, regDate, userNo, userName);
+				boardVo = new BoardVo(no, title, content, hit, regDate, userNo, userName, fileName1, fileSize1, fileName2, fileSize2);
 			}
 			
 		} catch (SQLException e) {
@@ -146,12 +150,16 @@ public class BoardDaoImpl implements BoardDao {
       System.out.println("vo.content : ["+vo.getContent()+"]");
       
 			// 3. SQL문 준비 / 바인딩 / 실행
-      String query = "insert into board values (seq_board_no.nextval, ?, ?, 0, sysdate, ?, 0, 0, 0)";
+      String query = "insert into board values (seq_board_no.nextval, ?, ?, 0, sysdate, ?, 0, 0, 0, ?, ?, ?, ?)";
 			pstmt = conn.prepareStatement(query);
 
 			pstmt.setString(1, vo.getTitle());
 			pstmt.setString(2, vo.getContent());
 			pstmt.setInt(3, vo.getUserNo());
+			pstmt.setString(4, vo.getFileName1());
+			pstmt.setInt(5, vo.getFileSize1());
+			pstmt.setString(6, vo.getFileName2());
+			pstmt.setInt(7, vo.getFileSize2());
 			
 			
       
@@ -232,12 +240,16 @@ public class BoardDaoImpl implements BoardDao {
 		  conn = getConnection();
 
 			// 3. SQL문 준비 / 바인딩 / 실행
-			String query = "update board set title = ?, content = ? where no = ? ";
+			String query = "update board set title = ?, content = ?, filename1 = ?, filesize1 = ?, filename2 = ?, filesize2 = ? where no = ? ";
 			pstmt = conn.prepareStatement(query);
 
 			pstmt.setString(1, vo.getTitle());
 			pstmt.setString(2, vo.getContent());
-			pstmt.setInt(3, vo.getNo());
+			pstmt.setString(3, vo.getFileName1());
+			pstmt.setInt(4, vo.getFileSize1());
+			pstmt.setString(5, vo.getFileName2());
+			pstmt.setInt(6, vo.getFileSize2());
+			pstmt.setInt(7, vo.getNo());
 
 			count = pstmt.executeUpdate();
 

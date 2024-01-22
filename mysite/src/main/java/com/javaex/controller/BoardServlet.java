@@ -1,6 +1,9 @@
 package com.javaex.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -21,6 +24,10 @@ import com.javaex.vo.UserVo;
 public class BoardServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
+	/* 파일 다운로드 시작 경성 */
+	private static final String SAVEFOLDER = "/Users/User/git/BoardProject/mysite/src/main/webapp/WEB-INF/uploadfile";
+	/* 파일 다운로드 끝 경성 */
+
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
@@ -36,11 +43,11 @@ public class BoardServlet extends HttpServlet {
 
 			// 리스트 화면에 보내기
 			request.setAttribute("list", list);
-			//WebUtil.forward(request, response, "/WEB-INF/views/board/list.jsp");
-			
+			// WebUtil.forward(request, response, "/WEB-INF/views/board/list.jsp");
+
 			RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/board/list.jsp");
-	    rd.forward(request, response);
-	    
+			rd.forward(request, response);
+
 		} else if ("read".equals(actionName)) {
 			// 게시물 가져오기
 			int no = Integer.parseInt(request.getParameter("no"));
@@ -66,12 +73,12 @@ public class BoardServlet extends HttpServlet {
 			String title = request.getParameter("title");
 			String content = request.getParameter("content");
 			int no = Integer.parseInt(request.getParameter("no"));
-			
+
 			BoardVo vo = new BoardVo(no, title, content);
 			BoardDao dao = new BoardDaoImpl();
-			
+
 			dao.update(vo);
-			
+
 			WebUtil.redirect(request, response, "/mysite/board?a=list");
 		} else if ("writeform".equals(actionName)) {
 			// 로그인 여부체크
@@ -82,23 +89,6 @@ public class BoardServlet extends HttpServlet {
 				WebUtil.redirect(request, response, "/mysite/board?a=list");
 			}
 
-		} else if ("write".equals(actionName)) {
-			UserVo authUser = getAuthUser(request);
-
-			String title = request.getParameter("title");
-			String content = request.getParameter("content");
-			
-			int userNo = authUser.getNo();
-			System.out.println("userNo : ["+userNo+"]");
-			System.out.println("title : ["+title+"]");
-			System.out.println("content : ["+content+"]");
-
-			BoardVo vo = new BoardVo(title, content, userNo);
-			BoardDao dao = new BoardDaoImpl();
-			dao.insert(vo);
-
-			WebUtil.redirect(request, response, "/mysite/board?a=list");
-
 		} else if ("delete".equals(actionName)) {
 			int no = Integer.parseInt(request.getParameter("no"));
 
@@ -107,6 +97,32 @@ public class BoardServlet extends HttpServlet {
 
 			WebUtil.redirect(request, response, "/mysite/board?a=list");
 
+		} else if ("download".equals(actionName)) {
+			request.setCharacterEncoding("utf-8");
+			response.setContentType("text/html; charset=utf-8");
+			String fileName = request.getParameter("fileName");
+			String path = SAVEFOLDER + "/" + fileName;
+			System.out.println(fileName);
+
+			OutputStream out = response.getOutputStream();
+			File file = new File(path);
+			
+			response.setHeader("Cache-Control", "no-cache");
+			response.addHeader("Content-disposition", "attachment; fileName=" + fileName);
+			
+			FileInputStream in = new FileInputStream(file); 
+			
+			byte[] buffer = new byte[1024 * 8];
+			
+			while (true) {
+				int count = in.read(buffer);
+				if (count == -1) {
+					break;
+				}
+				out.write(buffer, 0, count);
+			}
+			in.close();
+			out.close();
 		} else {
 			WebUtil.redirect(request, response, "/mysite/board?a=list");
 		}
