@@ -26,29 +26,123 @@ public class BoardServlet extends HttpServlet {
 		request.setCharacterEncoding("UTF-8");
 		String actionName = request.getParameter("a");
 		System.out.println("board:" + actionName);
-		
+
 		if ("list".equals(actionName)) {
 			// 리스트 가져오기 (기본)
-			BoardDao dao = new BoardDaoImpl();
-			List<BoardVo> list = dao.getList();
-
-			System.out.println(list.toString());
-			// 리스트 화면에 보내기
-			request.setAttribute("list", list);
-			//WebUtil.forward(request, response, "/WEB-INF/views/board/list.jsp");
+			// 리스트 가져오기
+			int pageNo = 1; //기본 페이지 번호
+			int pageSize = 10; //페이지크기
 			
-			// search 
-			if (request.getParameter("kwd") != null) {
-				String word = request.getParameter("kwd");
-				System.out.println("검색어: " + word);
-	
-				// 검색어를 JSP 페이지로 전송 (예시)
-				List<BoardVo> searchedList = dao.getSearchList(word);
-			    request.setAttribute("list", searchedList);
+			
+			//페이지 번호, 페이지 크기 파라미터 값 설정
+			String pageNoStr = request.getParameter("pageNo");
+			String pageSizeStr = request.getParameter("pageSize");
+			
+			if(pageNoStr != null && !pageNoStr.equals("")) {
+				pageNo = Integer.parseInt(pageNoStr);
+				
 			}
 			
-			RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/board/list.jsp");
-	    rd.forward(request, response);
+			if(pageSizeStr != null && !pageSizeStr.equals("")) {
+				pageSize = Integer.parseInt(pageSizeStr);
+			}
+
+			BoardDao dao = new BoardDaoImpl();
+			
+			 // 전체 페이지 수(totalPages)를 계산
+		    int totalPosts = dao.getTotalPosts(); 
+		    int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
+		    
+		    String word = request.getParameter("kwd");
+		    HttpSession session = request.getSession();
+		    session.setAttribute("searchKeyword", word);
+		    // null -> 검색어 입력하지 않았을 때
+		    if (session.getAttribute("searchKeyword") == null) {	
+		    	List<BoardVo> list = dao.getPageList(pageNo, pageSize);
+		    	request.setAttribute("list", list);
+			    request.setAttribute("pageNo", pageNo);
+			    request.setAttribute("totalPages", totalPages);
+			    System.out.println(list.toString());
+		    } else {
+		    	System.out.println("세션에 저장된 검색어: " + session.getAttribute("searchKeyword"));
+				System.out.println("검색어: " + word);
+					    
+				// 검색어를 JSP 페이지로 전송 (예시)
+				List<BoardVo> searchedList = dao.getSearchList(word, pageNo, pageSize);
+				
+				totalPosts = dao.getTotalSearchedPosts(word);
+				System.out.println("totalSearchedPosts: "+ totalPosts);
+				totalPages = (int) Math.ceil((double) totalPosts / pageSize);
+				
+				request.setAttribute("list", searchedList);
+			    request.setAttribute("pageNo", pageNo);
+			    request.setAttribute("totalPages", totalPages);
+		    }
+			
+//			// search 
+//			if (request.getParameter("kwd") != null) {	
+//				//페이지 번호, 페이지 크기 파라미터 값 설정
+//				pageNoStr = request.getParameter("pageNo");
+//				pageSizeStr = request.getParameter("pageSize");
+//				
+//				if(pageNoStr != null && !pageNoStr.equals("")) {
+//					pageNo = Integer.parseInt(pageNoStr);
+//					
+//				}
+//				
+//				if(pageSizeStr != null && !pageSizeStr.equals("")) {
+//					pageSize = Integer.parseInt(pageSizeStr);
+//				}
+//				String word = request.getParameter("kwd");
+//				System.out.println("검색어: " + word);
+//					    
+//				// 검색어를 JSP 페이지로 전송 (예시)
+//				List<BoardVo> searchedList = dao.getSearchList(word, pageNo, pageSize);
+//				
+//				totalPosts = dao.getTotalSearchedPosts(word);
+//				System.out.println("totalSearchedPosts: "+ totalPosts);
+//				totalPages = (int) Math.ceil((double) totalPosts / pageSize);
+//				
+//				request.setAttribute("list", searchedList);
+//			    request.setAttribute("pageNo", pageNo);
+//			    request.setAttribute("totalPages", totalPages);
+//			}
+			WebUtil.forward(request, response, "/WEB-INF/views/board/list.jsp");
+//		} else if ("search".equals(actionName)) {
+//			System.out.println("하이하이하이하이하이하이하이하ㅣ");
+//			
+//			int pageNo = 1; //기본 페이지 번호
+//			int pageSize = 10; //페이지크기
+//			
+//			//페이지 번호, 페이지 크기 파라미터 값 설정
+//			String pageNoStr = request.getParameter("pageNo");
+//			String pageSizeStr = request.getParameter("pageSize");
+//			
+//			BoardDao dao = new BoardDaoImpl();
+//			
+//			
+//			if(pageNoStr != null && !pageNoStr.equals("")) {
+//				pageNo = Integer.parseInt(pageNoStr);
+//				
+//			}
+//			
+//			if(pageSizeStr != null && !pageSizeStr.equals("")) {
+//				pageSize = Integer.parseInt(pageSizeStr);
+//			}
+//			String word = request.getParameter("kwd");
+//			System.out.println("검색어: " + word);
+//				    
+//			// 검색어를 JSP 페이지로 전송 (예시)
+//			List<BoardVo> searchedList = dao.getSearchList(word, pageNo, pageSize);
+//			
+//			int totalPosts = dao.getTotalSearchedPosts(word);
+//			int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
+//			
+//			request.setAttribute("list", searchedList);
+//		    request.setAttribute("pageNo", pageNo);
+//		    request.setAttribute("totalPages", totalPages);
+//			
+//			WebUtil.forward(request, response, "/WEB-INF/views/board/list.jsp");
 		} else if ("read".equals(actionName)) {
 			// 게시물 가져오기
 			int no = Integer.parseInt(request.getParameter("no"));
@@ -60,7 +154,9 @@ public class BoardServlet extends HttpServlet {
 			// 게시물 화면에 보내기
 			request.setAttribute("boardVo", boardVo);
 			WebUtil.forward(request, response, "/WEB-INF/views/board/read.jsp");
-		} else if ("modifyform".equals(actionName)) {
+		} 
+		
+		else if ("modifyform".equals(actionName)) {
 			// 게시물 가져오기
 			int no = Integer.parseInt(request.getParameter("no"));
 			BoardDao dao = new BoardDaoImpl();
@@ -69,7 +165,9 @@ public class BoardServlet extends HttpServlet {
 			// 게시물 화면에 보내기
 			request.setAttribute("boardVo", boardVo);
 			WebUtil.forward(request, response, "/WEB-INF/views/board/modifyform.jsp");
-		} else if ("modify".equals(actionName)) {
+		} 
+		
+		else if ("modify".equals(actionName)) {
 			// 게시물 가져오기
 			String title = request.getParameter("title");
 			String content = request.getParameter("content");
@@ -81,7 +179,9 @@ public class BoardServlet extends HttpServlet {
 			dao.update(vo);
 			
 			WebUtil.redirect(request, response, "/mysite/board?a=list");
-		} else if ("writeform".equals(actionName)) {
+		} 
+		
+		else if ("writeform".equals(actionName)) {
 			// 로그인 여부체크
 			UserVo authUser = getAuthUser(request);
 			if (authUser != null) { // 로그인했으면 작성페이지로
@@ -90,7 +190,9 @@ public class BoardServlet extends HttpServlet {
 				WebUtil.redirect(request, response, "/mysite/board?a=list");
 			}
 
-		} else if ("write".equals(actionName)) {
+		} 
+		
+		else if ("write".equals(actionName)) {
 			UserVo authUser = getAuthUser(request);
 
 			String title = request.getParameter("title");
@@ -107,7 +209,9 @@ public class BoardServlet extends HttpServlet {
 
 			WebUtil.redirect(request, response, "/mysite/board?a=list");
 
-		} else if ("delete".equals(actionName)) {
+		} 
+		
+		else if ("delete".equals(actionName)) {
 			int no = Integer.parseInt(request.getParameter("no"));
 
 			BoardDao dao = new BoardDaoImpl();
@@ -115,7 +219,9 @@ public class BoardServlet extends HttpServlet {
 
 			WebUtil.redirect(request, response, "/mysite/board?a=list");
 
-		} else {
+		} 
+		
+		else {
 			WebUtil.redirect(request, response, "/mysite/board?a=list");
 		}
 	}
@@ -125,7 +231,7 @@ public class BoardServlet extends HttpServlet {
 		doGet(request, response);
 	}
 
-	// 로그인 되어 있는 정보를 가져온다.
+	// 로그인 되어 있는 정보를 가져옴
 	protected UserVo getAuthUser(HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		UserVo authUser = (UserVo) session.getAttribute("authUser");
@@ -133,4 +239,6 @@ public class BoardServlet extends HttpServlet {
 		return authUser;
 	}
 
+	
+	
 }

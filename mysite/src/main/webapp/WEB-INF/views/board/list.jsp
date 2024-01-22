@@ -1,6 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-
+<%@ page import="com.javaex.dao.BoardDao"%>
+<%@ page import="com.javaex.dao.BoardDaoImpl"%>
+<%
+  // BoardDao 객체 생성
+  BoardDao boardDao = new BoardDaoImpl();
+  // DAO를 통해 전체 게시물 수 가져오기
+  int totalPosts = boardDao.getTotalPosts();
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,10 +21,13 @@
 		<c:import url="/WEB-INF/views/includes/header.jsp"></c:import>
 		<c:import url="/WEB-INF/views/includes/navigation.jsp"></c:import>
 		
+		<!-- 전체 게시물 수 표시 -->
+        <p style="float: left; margin-top: 40px;">전체 게시물 수:  <%= totalPosts %>  </p>
 		<div id="content">
-			<div id="board">
-				<form id="search_form" action="" method="post">
-					<input type="text" id="kwd" name="kwd" value="${param.kwd}">
+			<div id="board">       
+                 <!-- 검색 폼 -->
+				    <form id="search_form" action="" method="post">
+					<input type="text" id="kwd" name="kwd" value="${sessionScope.searchKeyword}">
 					<input type="submit" value="찾기">
 				</form>
 				<table class="tbl-ex">
@@ -28,8 +38,11 @@
 						<th>조회수</th>
 						<th>작성일</th>
 						<th>&nbsp;</th>
-					</tr>				
+					</tr>	
+					
+								
 					<c:forEach items="${list }" var="vo">
+						
 						<tr>
 							<td>${vo.no }</td>
 							<td><a href="/mysite/board?a=read&no=${vo.no }"> ${vo.title } </a></td>
@@ -44,22 +57,33 @@
 						</tr>
 					</c:forEach>
 				</table>
-				<div class="pager">
-					<ul>
-						<li><a href="">◀</a></li>
-						<li><a href="">1</a></li>
-						<li><a href="">2</a></li>
-						<li class="selected">3</li>
-						<li><a href="">4</a></li>
-						<li><a href="">5</a></li>
-						<li><a href="">6</a></li>
-						<li><a href="">7</a></li>
-						<li><a href="">8</a></li>
-						<li><a href="">9</a></li>
-						<li><a href="">10</a></li>
-						<li><a href="">▶</a></li>
-					</ul>
-				</div>				
+				
+				
+				
+				
+<div class="pager">
+    <ul>
+        <c:if test="${pageNo > 1}">
+            <li><a href="/mysite/board?a=list&pageNo=${pageNo - 1}">◀</a></li>
+        </c:if>
+
+        <c:forEach begin="1" end="${totalPages}" var="i">
+            <c:choose>
+                <c:when test="${pageNo == i}">
+                    <li class="selected">${i}</li>
+                </c:when>
+                <c:otherwise>
+                    <li><a href="/mysite/board?a=list&pageNo=${i}">${i}</a></li>
+                </c:otherwise>
+            </c:choose>
+        </c:forEach>
+
+        <c:if test="${pageNo < totalPages}">
+            <li><a href="/mysite/board?a=list&pageNo=${pageNo + 1}">▶</a></li>
+        </c:if>
+    </ul>
+</div>
+				
 				<c:if test="${authUser != null }">
 					<div class="bottom">
 						<a href="/mysite/board?a=writeform" id="new-book">글쓰기</a>
