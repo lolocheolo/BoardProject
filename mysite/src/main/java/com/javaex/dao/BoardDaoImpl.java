@@ -110,7 +110,7 @@ public class BoardDaoImpl implements BoardDao {
 		             + ") WHERE rnum BETWEEN ? AND ?";
 
 			
-			int startRow = 1;
+			int startRow = (pageNo - 1) * pageSize + 1;;
 	        int endRow = pageNo * pageSize;
 
 			
