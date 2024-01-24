@@ -1,6 +1,6 @@
 # BoardProject
 ## 📌 System Architecture
-<img width="630" alt="image" src="https://user-images.githubusercontent.com/63691589/235383674-fd54385c-99eb-45c4-8f41-52ac6b0caa13.png">
+<img width="765" alt="image" src="https://github.com/lolocheolo/BoardProject/assets/71022455/10e567b3-21a9-454d-81b7-482e12668830">
 
 
 ## 📌 Run Screen
