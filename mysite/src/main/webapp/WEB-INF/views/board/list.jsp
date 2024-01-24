@@ -5,8 +5,14 @@
 <%
   // BoardDao 객체 생성
   BoardDao boardDao = new BoardDaoImpl();
-  // DAO를 통해 전체 게시물 수 가져오기
-  int totalPosts = boardDao.getTotalPosts();
+  
+  // 현재 검색어 세션 확인
+  String searchKeyword = (String) session.getAttribute("searchKeyword");
+  
+  // 검색어가 있을 경우 검색된 게시물 수 가져오기, 없을 경우 전체 게시물 수 가져오기
+  int totalPosts = (searchKeyword != null && !searchKeyword.isEmpty()) ? 
+                   boardDao.getTotalSearchedPosts(searchKeyword) : 
+                   boardDao.getTotalPosts();
 %>
 <!DOCTYPE html>
 <html>
@@ -21,18 +27,13 @@
 		<c:import url="/WEB-INF/views/includes/header.jsp"></c:import>
 		<c:import url="/WEB-INF/views/includes/navigation.jsp"></c:import>
 		
-		
-		
-		
-		<div id="content">
-			<div id="board">
-			
-				<!-- 전체 게시물 수 표시 -->
+		<!-- 전체 게시물 수 표시 -->
         <p style="float: left; margin-top: 40px;">전체 게시물 수:  <%= totalPosts %>  </p>
-       
+		<div id="content">
+			<div id="board">       
                  <!-- 검색 폼 -->
-				    <form id="search_form" action="" method="post">
-					<input type="text" id="kwd" name="kwd" value="">
+				    <form id="search_form" action="/mysite/board?a=list" method="post">
+					<input type="text" id="kwd" name="kwd" value="${sessionScope.searchKeyword}">
 					<input type="submit" value="찾기">
 				</form>
 				<table class="tbl-ex">
@@ -68,8 +69,8 @@
 				
 <div class="pager">
     <ul>
-        <c:if test="${pageNo > 1}">
-            <li><a href="/mysite/board?a=list&pageNo=${pageNo - 1}">◀</a></li>
+        <c:if test="${pageNo > 1}"> <!-- pageNo가 2부터 ◀ 얘 누르면 하나 감소 -->
+            <li><a href="/mysite/board?a=list&pageNo=${pageNo - 1}&search=${sessionScope.searchKeyword}">◀</a></li>
         </c:if>
 
         <c:forEach begin="1" end="${totalPages}" var="i">
@@ -78,21 +79,17 @@
                     <li class="selected">${i}</li>
                 </c:when>
                 <c:otherwise>
-                    <li><a href="/mysite/board?a=list&pageNo=${i}">${i}</a></li>
+                    <li><a href="/mysite/board?a=list&pageNo=${i}&search=${sessionScope.searchKeyword}">${i}</a></li>
                 </c:otherwise>
             </c:choose>
         </c:forEach>
 
-        <c:if test="${pageNo < totalPages}">
-            <li><a href="/mysite/board?a=list&pageNo=${pageNo + 1}">▶</a></li>
+        <c:if test="${pageNo < totalPages}"> <!-- pageNo가 2부터 ▶ 얘 누르면 하나 증가 -->
+            <li><a href="/mysite/board?a=list&pageNo=${pageNo + 1}&search=${sessionScope.searchKeyword}">▶</a></li>
         </c:if>
     </ul>
 </div>
 				
-						
-						
-						
-						
 				<c:if test="${authUser != null }">
 					<div class="bottom">
 						<a href="/mysite/board?a=writeform" id="new-book">글쓰기</a>
@@ -105,5 +102,4 @@
 		
 	</div><!-- /container -->
 </body>
-</html>		
-		
+</html>	

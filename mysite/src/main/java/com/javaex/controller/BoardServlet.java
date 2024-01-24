@@ -25,46 +25,58 @@ public class BoardServlet extends HttpServlet {
 			throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
 		String actionName = request.getParameter("a");
-		System.out.println("board:" + actionName);
+		HttpSession session = request.getSession();
+		
+		// 게시판 클릭시 searchKeyword 세션에 저장된 내용 삭제
+		if (actionName == null ) session.removeAttribute("searchKeyword");
 
 		if ("list".equals(actionName)) {
-			// 리스트 가져오기
-			int pageNo=1; //기본 페이지 번호
-			int pageSize=10; //페이지크기
+			
+			
+			int pageNo = 1; //기본 페이지 번호
+			int pageSize = 10; //페이지크기
 			
 			
 			//페이지 번호, 페이지 크기 파라미터 값 설정
-			String pageNoStr=request.getParameter("pageNo");
-			String pageSizeStr=request.getParameter("pageSize");
+			String pageNoStr = request.getParameter("pageNo");
+			String pageSizeStr = request.getParameter("pageSize");
 			
-			if(pageNoStr != null && !pageNoStr.equals("")) {
-				pageNo=Integer.parseInt(pageNoStr);
-				
-			}
-			
-			if(pageSizeStr != null && !pageSizeStr.equals("")) {
-				pageSize = Integer.parseInt(pageSizeStr);
-			}
+			if(pageNoStr != null && !pageNoStr.equals("")) pageNo = Integer.parseInt(pageNoStr);
+			if(pageSizeStr != null && !pageSizeStr.equals("")) pageSize = Integer.parseInt(pageSizeStr);
 			
 			BoardDao dao = new BoardDaoImpl();
 			
-			 // 전체 페이지 수(totalPages)를 계산
+			// 전체 페이지 수(totalPages)를 계산
 		    int totalPosts = dao.getTotalPosts(); 
 		    int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
 		    
-		    
-			List<BoardVo> list = dao.getPageList(pageNo, pageSize);
-
-		//	System.out.println(list.toString());
-
-			// 리스트 화면에 보내기
-			request.setAttribute("list", list);
-		    request.setAttribute("pageNo", pageNo);
-		    request.setAttribute("totalPages", totalPages);
+		    // NULL이 아닐때 한번만 실행됨 (검색어를 세션에 넣어주기)
+		    String word = "";
+		    if (request.getParameter("kwd") != null ) {
+		    	word = request.getParameter("kwd");
+		    	session.setAttribute("searchKeyword", word);
+		    }
+		
+		    // NULL -> 검색어 입력하지 않았을 때
+		    System.out.println("세션에 들어있는 정보: "+ session.getAttribute("searchKeyword"));
+		    if (session.getAttribute("searchKeyword") == null) {	
+		    	List<BoardVo> list = dao.getPageList(pageNo, pageSize);
+		    	
+		    	request.setAttribute("list", list);
+			    request.setAttribute("pageNo", pageNo);
+			    request.setAttribute("totalPages", totalPages);
+		    } else {
+				// 검색어를 JSP 페이지로 전송 (예시)
+				word = (String) session.getAttribute("searchKeyword");
+				List<BoardVo> searchedList = dao.getSearchList(word, pageNo, pageSize);
+				totalPosts = dao.getTotalSearchedPosts(word);
+				totalPages = (int) Math.ceil((double) totalPosts / pageSize);
+				
+				request.setAttribute("list", searchedList);
+			    request.setAttribute("pageNo", pageNo);
+			    request.setAttribute("totalPages", totalPages);
+		    }
 			WebUtil.forward(request, response, "/WEB-INF/views/board/list.jsp");
-			
-			//RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/board/list.jsp");
-	  //  rd.forward(request, response);
 		} 
 		
 		else if ("read".equals(actionName)) {
