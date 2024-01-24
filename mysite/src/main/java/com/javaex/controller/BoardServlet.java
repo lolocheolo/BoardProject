@@ -19,6 +19,14 @@ import com.javaex.util.WebUtil;
 import com.javaex.vo.BoardVo;
 import com.javaex.vo.UserVo;
 
+/**
+ * 6조 게시판 역할 및 기능구현
+ * 박철호(Team Leader) 	   : Board Paging
+ * 양민주(Trouble Shooter)  : Board Search
+ * 백경성(Developer)		   : Board File Upload 
+ * 박경진(Project Manager)  : Board File Download
+ */
+
 @WebServlet("/board")
 public class BoardServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -34,7 +42,8 @@ public class BoardServlet extends HttpServlet {
 		
 		// 게시판 클릭시 searchKeyword 세션에 저장된 내용 삭제
 		if (actionName == null ) session.removeAttribute("searchKeyword");
-
+		
+		/* Board Paging & Board Search Start By 박철호, 양민주 */
 		if ("list".equals(actionName)) {
 			
 			
@@ -83,7 +92,7 @@ public class BoardServlet extends HttpServlet {
 		    }
 			WebUtil.forward(request, response, "/WEB-INF/views/board/list.jsp");
 		} 
-		
+		/* Board Paging & Board Search End By 박철호, 양민주 */
 		else if ("read".equals(actionName)) {
 			// 게시물 가져오기
 			int no = Integer.parseInt(request.getParameter("no"));
@@ -128,13 +137,16 @@ public class BoardServlet extends HttpServlet {
 			WebUtil.redirect(request, response, "/mysite/board?a=list");
 
 		} 
+		/* Board File Download Start By 박경진, 백경성 */
 		else if ("download".equals(actionName)) {
 			request.setCharacterEncoding("utf-8");
 			response.setContentType("text/html; charset=utf-8");
+			
+			// 파일 이름 받아오기 
 			String fileName = request.getParameter("fileName");
 			String path = SAVEFOLDER + "/" + fileName;
-			System.out.println(fileName);
 
+			// 파일 및 경로 생성
 			OutputStream out = response.getOutputStream();
 			File file = new File(path);
 			
@@ -143,8 +155,10 @@ public class BoardServlet extends HttpServlet {
 			
 			FileInputStream in = new FileInputStream(file); 
 			
+			// 버퍼 크기 설정
 			byte[] buffer = new byte[1024 * 8];
 			
+			// 버퍼 단위로 파일 읽고 저장하기
 			while (true) {
 				int count = in.read(buffer);
 				if (count == -1) {
@@ -155,7 +169,7 @@ public class BoardServlet extends HttpServlet {
 			in.close();
 			out.close();
 		}
-		
+		/* Board File Download End By 박경진 */
 		else {
 			WebUtil.redirect(request, response, "/mysite/board?a=list");
 		}
