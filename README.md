@@ -1,5 +1,6 @@
 # BoardProject
 ## 📌 Run Screen
+![image](https://github.com/lolocheolo/BoardProject/assets/71022455/7ac9751a-b230-4176-95ff-b816f3338100)
 
 
 ## 📌 System Architecture
