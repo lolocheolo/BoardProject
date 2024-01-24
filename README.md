@@ -5,13 +5,13 @@
 
 ## 📌 Run Screen
 <div align=center>
-  <img width="785" alt="image" src="https://github.com/lolocheolo/BoardProject/assets/71022455/7ac9751a-b230-4176-95ff-b816f3338100">
+  <img width="876" alt="image" src="https://github.com/lolocheolo/BoardProject/assets/71022455/05380ab7-cfee-4ae2-b38c-4ee975931947">
 </div>
 <div align=center>
   <img width="785" alt="image" src="https://github.com/lolocheolo/BoardProject/assets/71022455/f4485179-6363-471b-9e62-2767acc81d38">
 </div>
 <div align=center>
-  <img width="785" alt="image" src="https://github.com/lolocheolo/BoardProject/assets/71022455/0c1b8b0e-039c-4f59-969a-b52c44f66c1a">
+  <img width="787" alt="image" src="https://github.com/lolocheolo/BoardProject/assets/71022455/a3463c84-7025-4a6c-ab96-04432f297d2d">
 </div>
 
 ## 📌 Task
