@@ -5,7 +5,7 @@
 
 ## 📌 Run Screen
 <div align=center>
-  <img width="876" alt="image" src="https://github.com/lolocheolo/BoardProject/assets/71022455/05380ab7-cfee-4ae2-b38c-4ee975931947">
+  <img width="785" alt="image" src="https://github.com/lolocheolo/BoardProject/assets/71022455/05380ab7-cfee-4ae2-b38c-4ee975931947">
 </div>
 <div align=center>
   <img width="785" alt="image" src="https://github.com/lolocheolo/BoardProject/assets/71022455/f4485179-6363-471b-9e62-2767acc81d38">
