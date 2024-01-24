@@ -6,7 +6,11 @@
 ## 📌 Run Screen
 <div align=center>
 ![image](https://github.com/lolocheolo/BoardProject/assets/71022455/7ac9751a-b230-4176-95ff-b816f3338100)
+</div>
+<div align=center>
 ![image](https://github.com/lolocheolo/BoardProject/assets/71022455/f4485179-6363-471b-9e62-2767acc81d38)
+</div>
+<div align=center>
 ![image](https://github.com/lolocheolo/BoardProject/assets/71022455/0c1b8b0e-039c-4f59-969a-b52c44f66c1a)
 </div>
 
