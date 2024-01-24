@@ -33,6 +33,14 @@
 							</td>
 						</tr>
 						<tr>
+							<td style="font-weight:bold;color:red;">
+								참고
+							</td>
+							<td style="color:red;">
+								파일첨부는 영어 이름으로 된 파일만 가능합니다.
+							</td>
+						</tr>
+						<tr>
 							<td class="label">파일1</td>
 							<td>
 								<input type="file" name="filename1" size="50" maxlength="50">
