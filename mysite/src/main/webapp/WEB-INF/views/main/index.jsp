@@ -18,7 +18,7 @@
 			<div id="content">
 				<div id="site-introduction">
 					<img style="width: 150px" id="profile" src="/mysite/assets/images/profile.png">
-					<h2>안녕하세요.<br> 홍길동의 mysite에 방문하신 것을<br/> 환영합니다.</h2>
+					<h2>안녕하세요.<br> 6조의 mysite에 방문하신 것을<br/> 환영합니다.</h2>
 					<p>
 						이 사이트는 웹 프로그램밍 실습과제 예제 사이트입니다.
 						<br>
